@@ -1,0 +1,27 @@
+######################################
+# Author: Marijana Vujkovic
+# Date: 2017
+#
+# target.rules
+######################################
+
+############################### Create targets to run several jobs (batches) at the same time
+
+# to run the targets:
+#
+# cd /project/saleheenlab/snakemake
+# source activate promis
+# screen -dR mysession
+# snakemake -j 300 --cluster-config config/cluster.yaml -c "bsub -V -l h_vmem={cluster.g_vmem} -l mem_free={cluster.mem_free} -l mem_free_l={cluster.m_mem_free} -pe smp {threads}" targetName
+#
+
+# create sample file
+rule make_sample:
+        output:
+                [ expand("output/PROMIS/imputed/GWAS{cohort}/promis_gwas{cohort}.sample", cohort = range(1, 3)) ]
+
+# snptest
+#rule make_snptest:
+#  input:
+#    [ expand("/project/saleheenlab/snakemake/output/PROMIS/imputed/GWAS{cohort}/{pheno}/chr{chr}/promis_gwas{cohort}_chr{chr}:{interval}.out", pheno = config['current'], interval = ((lambda x, y: str(x) + ":" + str((5 * y) + 1) + "e6-" + str(5 * (y + 1)))(x, y) + "e6" for x in range(1, 22) for y in range(0, config['chrChunk'][x]))) ]
+
