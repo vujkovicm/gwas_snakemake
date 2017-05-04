@@ -9,7 +9,7 @@
 # create .sample including phenotypes and covariates
 rule create_sample:
         output:
-                "output/PROMIS/imputed/GWAS{cohort}/promis_gwas{cohort}.sample" for cohort in range(1, 3)
+                "output/PROMIS/imputed/GWAS{cohort}/promis_gwas{cohort}.sample"
         shell:
                 """
                 Rscript R/create_sample.R '{wildcards.cohort}'
