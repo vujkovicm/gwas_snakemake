@@ -1,0 +1,41 @@
+current:
+ - GWAS
+
+
+# .sample file
+# order: covariates before phenotypes
+
+dotSample:
+ age:           [ AGE,   C]
+ gender:        [ SEX,   D, male]
+ c1:            [ PCA1,  C]
+ c2:            [ PCA2,  C]
+ c3:            [ PCA3,  C]
+ c4:            [ PCA4,  C]
+ c5:            [ PCA5,  C]
+ c6:            [ PCA6,  C]
+ c7:            [ PCA7,  C]
+ c8:            [ PCA8,  C]
+ c9:            [ PCA9,  C]
+ c10:           [ PCA10, C]
+ status:        [ MI,    B, control]
+ ldlmgdl:       [ LDL,   P]
+
+chrChunk:
+- 84
+- 82
+- 67
+- 64
+- 61
+- 58
+- 54
+- 49
+- 48
+- 46
+- 46
+- 45
+- 39
+- 36
+- 35
+- 31
+- 28
