@@ -1,10 +1,9 @@
 current:
- - GWAS
-
+ - MI
+ - LDL
 
 # .sample file
 # order: covariates before phenotypes
-
 dotSample:
  age:           [ AGE,   C]
  gender:        [ SEX,   D, male]
