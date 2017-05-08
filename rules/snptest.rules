@@ -36,3 +36,23 @@ rule snptest:
                 -hwe
                 """
 
+
+# extract all snptest files (for merging)
+rule snptest_list:
+        output:
+                "out/PROMIS/imputed/GWAS{cohort}/{pheno}/{pheno}_snptest_chunks_gwas{cohort}.txt"
+        shell:
+                """
+                file out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/*/* | sed 's/[:].*$//' >> {output}
+                """
+
+# merge all snptest files
+rule merge_all:
+        input:
+                "out/PROMIS/imputed/GWAS{cohort}/{pheno}/{pheno}_snptest_chunks_gwas{cohort}.txt"
+        output:
+                "out/PROMIS/imputed/GWAS{cohort}/{pheno}/summary/snptest_gwas{cohort}.out"
+        shell:
+                """
+                RScript R/merge_snptest.R '{wildcards.cohort}' '{wildcards.pheno}'
+                """
