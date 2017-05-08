@@ -18,15 +18,14 @@ rule create_sample:
 # SNPTEST association
 rule snptest:
         input:
-                gz      = "/project/saleheenlab/original_data/PROMIS_GWAS12_1kG_phase3_imputed/GWAS{cohort}/by_chr/chr{chr}/promis_gwas{cohort}_chr_{chr}_{from}e6_{to}e6.gz",
-                sample  = "/project/saleheenlab/snakemake/out/PROMIS/imputed/GWAS{cohort}/promis_gwas{cohort}.sample",
+                sample = "/project/saleheenlab/snakemake/out/PROMIS/imputed/GWAS{cohort}/promis_gwas{cohort}.sample",
                 exclude = "/project/saleheenlab/original_data/PROMIS_GWAS12_1kG_phase3_imputed/GWAS{cohort}/promis_gwas{cohort}_sample_exclusion.list"
         output:
-                "/project/saleheenlab/snakemake/out/PROMIS/imputed/GWAS{cohort}/{pheno}/chr{chr}/promis_chr_{chr}_{from}e6_{to}e6.out"
+                "out/PROMIS/imputed/GWAS{cohort}/{pheno}/chr{chr}/promis_chr_{chr}_{from}e6_{to}e6.out"
         shell:
                 """
                 /project/saleheenlab/software/SNPTEST/snptest_v2.5.2/snptest_v2.5.2_linux_x86_64_static/snptest_v2.5.2 \
-                -data {input.gz} {input.sample} \
+                -data /project/saleheenlab/original_data/PROMIS_GWAS12_1kG_phase3_imputed/GWAS{wildcards.cohort}/by_chr/chr{wildcards.chr}/promis_gwas{wildcards.cohort}_chr_{wildcards.chr}_{wildcards.from}e6_{wildcards.to}e6.gz {input.sample} \
                 -o {output} \
                 -genotype_field GP \
                 -frequentist 1 \
@@ -35,7 +34,6 @@ rule snptest:
                 -exclude_samples {input.exclude} \
                 -hwe
                 """
-
 
 # extract all snptest files (for merging)
 rule snptest_list:
