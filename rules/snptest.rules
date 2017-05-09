@@ -62,6 +62,8 @@ rule merge_all:
 
 # create metal file
 rule create_metal:
+        input:
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.maf{maf}.out"
         output:
                 "other/promis_{pheno}_gwas{cohort}.maf{maf}.metal"
         shell:
