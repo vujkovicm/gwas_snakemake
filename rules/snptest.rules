@@ -46,6 +46,7 @@ rule snptest_list:
 
 
 # merge all snptest files
+# maf >= .01 or maf >= .05, hwe >= 10xe06, info >= .8
 rule merge_all:
         input:
                 "out/PROMIS/imputed/GWAS{cohort}/{pheno}/{pheno}_snptest_chunks_gwas{cohort}.txt"
