@@ -68,7 +68,7 @@ rule create_metal:
                 "other/promis_{pheno}_gwas{cohort}.maf{maf}.metal"
         shell:
                 """
-                python py/create_metal.py '{wildcards.gwas}' '{wildcards.pheno}' '{wildcards.maf}'
+                Rscript R/create_metal.R '{wildcards.gwas}' '{wildcards.pheno}' '{wildcards.maf}'
                 """
 
 # run metal analysis
@@ -81,4 +81,3 @@ rule run_metal:
                 """
                 /project/saleheenlab/software/METAL/generic-metal/metal {input}
                 """
-
