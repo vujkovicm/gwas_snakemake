@@ -44,13 +44,39 @@ rule snptest_list:
                 file out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/*/* | sed 's/[:].*$//' >> {output}
                 """
 
+
 # merge all snptest files
 rule merge_all:
         input:
                 "out/PROMIS/imputed/GWAS{cohort}/{pheno}/{pheno}_snptest_chunks_gwas{cohort}.txt"
         output:
-                "out/PROMIS/imputed/GWAS{cohort}/{pheno}/summary/snptest_gwas{cohort}.out"
+                maf001 = "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.maf001.out",
+                maf005 = "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.maf005.out"
         shell:
                 """
-                RScript R/merge_snptest.R '{wildcards.cohort}' '{wildcards.pheno}'
+                echo 'filename alternate_ids rsid chromosome position alleleA alleleB index average_maximum_posterior_call info cohort_1_AA cohort_1_AB cohort_1_BB cohort_1_NULL all_AA all_AB all_BB all_NULL all_total all_maf missing_data_proportion cohort_1_hwe frequentist_add_pvalue frequentist_add_info frequentist_add_beta_1 frequentist_add_se_1 comment' > {output.maf001}
+                awk 'FNR > 15 {{if ($9 >= 0.8 && $19 >= 0.01 && $21 >= 0.000001) print FILENAME " " $0}}' out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/*/*.out >> {output.maf001}
+                echo 'filename alternate_ids rsid chromosome position alleleA alleleB index average_maximum_posterior_call info cohort_1_AA cohort_1_AB cohort_1_BB cohort_1_NULL all_AA all_AB all_BB all_NULL all_total all_maf missing_data_proportion cohort_1_hwe frequentist_add_pvalue frequentist_add_info frequentist_add_beta_1 frequentist_add_se_1 comment' > {output.maf005}
+                awk 'FNR > 15 {{if ($9 >= 0.8 && $19 >= 0.05 && $21 >= 0.000001) print FILENAME " " $0}}' out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/*/*.out >> {output.maf005}
                 """
+
+# create metal file
+rule create_metal:
+        output:
+                "other/promis_{pheno}_gwas{cohort}.maf{maf}.metal"
+        shell:
+                """
+                python py/create_metal.py '{wildcards.gwas}' '{wildcards.pheno}' '{wildcards.maf}'
+                """
+
+# run metal analysis
+rule run_metal:
+        input:
+                "other/promis_{pheno}_gwas{cohort}.maf{maf}.metal"
+        output:
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.metal.maf{maf}.out"
+        shell:
+                """
+                /project/saleheenlab/software/METAL/generic-metal/metal {input}
+                """
+
