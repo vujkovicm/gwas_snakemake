@@ -30,3 +30,11 @@ rule make_snptest:
 rule make_chunklist:
         input:
                 [ expand("out/PROMIS/imputed/GWAS{cohort}/{pheno}/{pheno}_snptest_chunks_gwas{cohort}.txt", cohort = range(1, 3), pheno = config['current']) ]
+
+rule merge_snptest:
+        input:
+                [ expand("out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.maf{maf}.out", cohort = range(1, 3), maf = ['001', '005'], pheno = config['current'])]
+
+rule make_metal:
+        input:
+                [ expand("out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.maf{maf}1.TBL", maf = ['001', '005'], pheno = config['current'])]
