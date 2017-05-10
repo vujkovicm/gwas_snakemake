@@ -1,0 +1,53 @@
+---
+title: "PROMIS GWAS Summary"
+author: M.Vujkovic
+output: html_document
+---
+
+# Study Design
+The study population consists of ...
+
+# Data Analysis
+## Step 1
+this is step 1
+## Step 2
+this is step 2
+## Quality Control
+this is quality control
+## SNPTEST
+this is snptest
+## METAL
+this is meta-analysis
+
+```{r include=FALSE,  echo=FALSE, message=FALSE}
+
+args <- commandArgs(trailingOnly = TRUE)
+
+require("ggplot2")
+require("qqman")
+
+dir = "/project/saleheenlab/snakemake"
+
+snptest <- "read table"
+# add chromosome information
+# rename the columns for qqman
+metal   <- "read table"
+# rename the columns for qqman
+```
+```{r echo=TRUE}
+# show the hits from snptest (table)
+
+# show the hits from meta-analysis (table)
+```
+
+```{r, fig.width=7.5, fig.height=2.5}
+# plot something random
+manhattan(snptest,
+        main = "AML Susceptibility",
+        adj = 0,
+        xlab = "",
+        ylim = c(0, 12),
+        cex = 1,
+        cex.axis = 1,
+        cex.main = 2,
+        col = c("steelblue", "steelblue1", "slategray3"),
