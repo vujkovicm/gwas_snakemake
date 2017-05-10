@@ -61,24 +61,26 @@ rule merge_all:
                 awk 'FNR > 15 {{if ($9 >= 0.8 && $19 >= 0.05 && $21 >= 0.000001) print FILENAME " " $0}}' out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/*/*.out >> {output.maf005}
                 """
 
-# create metal file
+#create metal file
 rule create_metal:
         input:
-                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.maf{maf}.out"
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas1.snptest.maf{maf}.out",
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas2.snptest.maf{maf}.out"
         output:
-                "other/promis_{pheno}_gwas{cohort}.maf{maf}.metal"
+                "script/promis_{pheno}.maf{maf}.metal"
         shell:
                 """
-                Rscript R/create_metal.R '{wildcards.gwas}' '{wildcards.pheno}' '{wildcards.maf}'
+                Rscript R/create_metal.R '{wildcards.pheno}' '{wildcards.maf}'
                 """
 
-# run metal analysis
+# run meta-analysis
 rule run_metal:
         input:
-                "other/promis_{pheno}_gwas{cohort}.maf{maf}.metal"
+                "script/promis_{pheno}.maf{maf}.metal"
         output:
-                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.metal.maf{maf}.out"
+                "out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.maf{maf}.TBL"
         shell:
                 """
                 /project/saleheenlab/software/METAL/generic-metal/metal {input}
                 """
+
