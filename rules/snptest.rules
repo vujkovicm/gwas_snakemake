@@ -78,7 +78,7 @@ rule run_metal:
         input:
                 "script/promis_{pheno}.maf{maf}.metal"
         output:
-                "out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.maf{maf}.TBL"
+                "out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.maf{maf}1.TBL"
         shell:
                 """
                 /project/saleheenlab/software/METAL/generic-metal/metal {input}
