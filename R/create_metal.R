@@ -30,7 +30,7 @@ cat("SEPERATOR WHITESPACE \n")
 cat(paste("PROCESS ", dir, "out/PROMIS/imputed/summary/", args[1], "/", args[1], "_gwas2.snptest.maf", args[2], ".out \n", sep = ""))
 cat("\n")
 
-cat(paste("OUTFILE ", dir, "out/PROMIS/imputed/summary/", args[1], "/promis_", args[1], ".metal.maf", args[2], ".TBL \n", sep = ""))
+cat(paste("OUTFILE ", dir, "out/PROMIS/imputed/summary/", args[1], "/promis_", args[1], ".metal.maf", args[2], " .TBL \n", sep = ""))
 cat("ANALYZE \n")
 cat("SCHEME STDERR \n")
 cat("QUIT \n")
