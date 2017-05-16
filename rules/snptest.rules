@@ -84,3 +84,14 @@ rule run_metal:
                 /project/saleheenlab/software/METAL/generic-metal/metal {input}
                 """
 
+rule manhattan_report:
+        input:
+                s1  = "out/PROMIS/imputed/summary/LDL/LDL_gwas1.snptest.maf005.out",
+                s2  = "out/PROMIS/imputed/summary/LDL/LDL_gwas2.snptest.maf005.out",
+                m12 = "out/PROMIS/imputed/summary/LDL/promis_LDL.metal.maf0051.TBL"
+        output:
+                "out/PROMIS/imputed/summary/PROMIS_Summary.html"
+        shell:
+                """
+                Rscript report/runReport.R
+                """
