@@ -4,6 +4,7 @@ setwd("/project/saleheenlab/snakemake/report/")
 
 # getting pandoc errors with executing html reports
 # conda install -c conda-forge pandoc=1.19.2
+# also have cairo installed
 
 library(rmarkdown)
 library(tools)
