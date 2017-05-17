@@ -1,5 +1,0 @@
-__default__:
-  h_vmem: 5G
-  mem_free: 3G
-  m_mem_free: 2G
-  processors: 5
