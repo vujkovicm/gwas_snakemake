@@ -44,54 +44,67 @@ rule snptest_list:
                 file out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/*/* | sed 's/[:].*$//' >> {output}
                 """
 
-
-# merge all snptest files
-# maf >= .01 or maf >= .05, hwe >= 10xe06, info >= .8
+# merge all snptest files (info >= .8)
 rule merge_all:
         input:
                 "out/PROMIS/imputed/GWAS{cohort}/{pheno}/{pheno}_snptest_chunks_gwas{cohort}.txt"
         output:
-                maf001 = "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.maf001.out",
-                maf005 = "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.maf005.out"
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.out"
         shell:
                 """
-                echo 'filename alternate_ids rsid chromosome position alleleA alleleB index average_maximum_posterior_call info cohort_1_AA cohort_1_AB cohort_1_BB cohort_1_NULL all_AA all_AB all_BB all_NULL all_total all_maf missing_data_proportion cohort_1_hwe frequentist_add_pvalue frequentist_add_info frequentist_add_beta_1 frequentist_add_se_1 comment' > {output.maf001}
-                awk 'FNR > 15 {{if ($9 >= 0.8 && $19 >= 0.01 && $21 >= 0.000001) print FILENAME " " $0}}' out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/*/*.out >> {output.maf001}
-                echo 'filename alternate_ids rsid chromosome position alleleA alleleB index average_maximum_posterior_call info cohort_1_AA cohort_1_AB cohort_1_BB cohort_1_NULL all_AA all_AB all_BB all_NULL all_total all_maf missing_data_proportion cohort_1_hwe frequentist_add_pvalue frequentist_add_info frequentist_add_beta_1 frequentist_add_se_1 comment' > {output.maf005}
-                awk 'FNR > 15 {{if ($9 >= 0.8 && $19 >= 0.05 && $21 >= 0.000001) print FILENAME " " $0}}' out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/*/*.out >> {output.maf005}
+                file=$(ls out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/chr1/*.out | head -1)
+                echo "filename "$(sed -n '14p' ${{file}}) > {output}
+                awk 'FNR > 15 {{if ($9 >= 0.8) print FILENAME " " $0}}' out/PROMIS/imputed/GWAS{wildcards.cohort}/{wildcards.pheno}/*/*.out >> {output}
+                """
+
+# filter snptest output
+# requires -M 30860 (or job will fail)
+rule filter_snptest:
+        input:
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.out"
+        output:
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.filtered.out"
+        shell:
+                """
+                Rscript R/filter_snptest.R '{wildcards.pheno}' '{wildcards.cohort}'
                 """
 
 #create metal file
 rule create_metal:
         input:
-                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas1.snptest.maf{maf}.out",
-                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas2.snptest.maf{maf}.out"
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas1.snptest.filtered.out",
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas2.snptest.filtered.out"
         output:
-                "script/promis_{pheno}.maf{maf}.metal"
+                "script/promis_{pheno}.metal"
         shell:
                 """
-                Rscript R/create_metal.R '{wildcards.pheno}' '{wildcards.maf}'
+                Rscript R/create_metal.R '{wildcards.pheno}'
                 """
 
 # run meta-analysis
 rule run_metal:
         input:
-                "script/promis_{pheno}.maf{maf}.metal"
+                "script/promis_{pheno}.metal",
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas1.snptest.filtered.out",
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas2.snptest.filtered.out"
         output:
-                "out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.maf{maf}1.TBL"
+                "out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.1.TBL"
         shell:
                 """
                 /project/saleheenlab/software/METAL/generic-metal/metal {input}
                 """
 
+# generate html report
 rule manhattan_report:
         input:
-                s1  = "out/PROMIS/imputed/summary/LDL/LDL_gwas1.snptest.maf005.out",
-                s2  = "out/PROMIS/imputed/summary/LDL/LDL_gwas2.snptest.maf005.out",
-                m12 = "out/PROMIS/imputed/summary/LDL/promis_LDL.metal.maf0051.TBL"
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas1.snptest.filtered.out",
+                "out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas2.snptest.filtered.out",
+                "out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.1.TBL"
         output:
-                "out/PROMIS/imputed/summary/PROMIS_Summary.html"
+                "report/out/PROMIS_{pheno}_Summary.html"
         shell:
                 """
-                Rscript report/runReport.R
+                Rscript report/runReport.R '{wildcards.pheno}'
                 """
+
+
