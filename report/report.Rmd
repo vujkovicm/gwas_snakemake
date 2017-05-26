@@ -31,153 +31,106 @@ Results from association in GWAS1 and GWAS2 were meta-analyzed using METAL.
 Manhattan and QQ-plots were generated using R-qqman package.
 
 ```{r include = FALSE, echo = FALSE, message = FALSE}
-# args <- commandArgs(trailingOnly = TRUE)
+
+args <- commandArgs(trailingOnly = TRUE)
 
 require("ggplot2")
 require("qqman")
+require("data.table")
 
 dir = "/project/saleheenlab/snakemake/"
 
-# For MAF > .01
-ldl.s1  <- read.table(paste(dir, "out/PROMIS/imputed/summary/", "LDL/LDL_gwas1.snptest.maf005.out", sep = ""), sep = " ",  T, stringsAsFactors = F)
-ldl.s2  <- read.table(paste(dir, "out/PROMIS/imputed/summary/", "LDL/LDL_gwas2.snptest.maf005.out", sep = ""), sep = " ",  T, stringsAsFactors = F)
-ldl.m12 <- read.table(paste(dir, "out/PROMIS/imputed/summary/", "LDL/promis_LDL.metal.maf0051.TBL", sep = ""), sep = "\t", T, stringsAsFactors = F)
+# For MAF > .05
+s1    <- read.table(paste(dir, "out/PROMIS/imputed/summary/", args[1], "/", args[1], "_gwas1.snptest.filtered.out", sep = ""), sep = " ",  T, stringsAsFactors = F)
+s2    <- read.table(paste(dir, "out/PROMIS/imputed/summary/", args[1], "/", args[1], "_gwas2.snptest.filtered.out", sep = ""), sep = " ",  T, stringsAsFactors = F)
+metal <- read.table(paste(dir, "out/PROMIS/imputed/summary/", args[1], "/promis_", args[1], ".metal.1.TBL", sep = ""), sep = "\t", T, stringsAsFactors = F)
 
-#mi.s1   <- read.table(paste(dir, "out/PROMIS/imputed/summary/", "MI/MI_gwas1.snptest.maf005.out", sep = ""), sep = " ",  T, stringsAsFactors = F)
-#mi.s2   <- read.table(paste(dir, "out/PROMIS/imputed/summary/", "MI/MI_gwas2.snptest.maf005.out", sep = ""), sep = " ",  T, stringsAsFactors = F)
-#mi.m12  <- read.table(paste(dir, "out/PROMIS/imputed/summary/", "MI/promis_MI.metal.maf0051.TBL", sep = ""), sep = "\t", cd T, stringsAsFactors = F)
+# rename position and p-value for qqman manhattan plots
+colnames(s1)[5]  <- "BP"
+colnames(s1)[23] <- "P"
+colnames(s2)[5]  <- "BP"
+colnames(s2)[23] <- "P"
 
-# extract chromosome information from filename (for rs entries)
-ldl.s1$CHR <- sapply(strsplit(ldl.s1$filename, "_"), "[[", 3)
-ldl.s2$CHR <- sapply(strsplit(ldl.s2$filename, "_"), "[[", 3)
-ldl.s1$CHR <- as.numeric(ldl.s1$CHR)
-ldl.s2$CHR <- as.numeric(ldl.s2$CHR)
-#mi.s1$CHR <- sapply(strsplit(mi.s1$filename, "_"), "[[", 3)
-#mi.s2$CHR <- sapply(strsplit(mi.s2$filename, "_"), "[[", 3)
-#mi.s1$CHR <- as.numeric(mi.s1$CHR)
-#mi.s2$CHR <- as.numeric(mi.s2$CHR)
+# only select SNPs that occur in both studies
 
-ldl.s1$RS <- sapply(strsplit(ldl.s1$rsid, ":"), "[[", 1)
-ldl.s2$RS <- sapply(strsplit(ldl.s2$rsid, ":"), "[[", 1)
-#mi.s1$RS  <- sapply(strsplit(mi.s1$rsid,  ":"), "[[", 1)
-#mi.s2$RS  <- sapply(strsplit(mi.s2$rsid,  ":"), "[[", 1)
+colnames(d12)[7] <- "P"
 
-# rename the columns for qqman
-colnames(ldl.s1)[3] <- "SNP"
-colnames(ldl.s1)[5] <- "BP"
-colnames(ldl.s1)[23] <- "P"
-
-colnames(ldl.s2)[3] <- "SNP"
-colnames(ldl.s2)[5] <- "BP"
-colnames(ldl.s2)[23] <- "P"
-
-#colnames(mi.s1)[3] <- "SNP"
-#colnames(mi.s1)[5] <- "BP"
-#colnames(mi.s1)[23] <- "P"
-
-#colnames(mi.s2)[3] <- "SNP"
-#colnames(mi.s2)[5] <- "BP"
-#colnames(mi.s2)[23] <- "P"
-
-# transform chr X, Y, and MT to 22, 23, 24
-
-# metal output does not have CHR INFO
-ldl.m12$RS <- sapply(strsplit(ldl.m12$MarkerName, ":"), "[[", 1)
-#mi.m12$RS  <- sapply(strsplit(mi.m12$MarkerName,  ":"), "[[", 1)
-
-# transform to data.tables for quicker merge
-ldl.d1   <- data.table(ldl.s1[, c("RS", "CHR", "BP")], key ="RS")
-ldl.d2   <- data.table(ldl.s2[, c("RS", "CHR", "BP")], key ="RS")
-ldl.anno <- rbindlist(list(ldl.d1, ldl.d2))
-ldl.anno <- unique(ldl.anno)
-
-# transform meta-gwas also into data.table
-ldl.d12  <- data.table(ldl.m12, key = "RS")
-# mi.d12   <- data.table(mi.m12, key = "RS")
-ldl.d12.anno <- merge(ldl.d12, ldl.anno, by = .EACHI)
-# mi.d12.anno  <- merge(mi.d12,  mi.anno,  by = .EACHI)
-
-# colnames(ldl.d12.anno)[6] <- "P"
-# colnames(mi.m12.anno)[6] <- "P"
-
-# now you have SNP, BP, P, CHR for all the data.frames and can perform a manhattan plot
+```
 ```{r echo=TRUE}
-# show the hits from snptest (table)
-
-# show the hits from meta-analysis (table)
+# insert table here with regional hits
 ```
 
-```{r, fig.width=7.5, fig.height=2.5}
-# plot something random
-manhattan(ldl.s1,
-        main = "PROMIS 1: LDL Manhattan plot",
+```{r, fig.width = 15, fig.height = 5}
+manhattan(s1,
+        main = paste("PROMIS 1: ", args[1], " Manhattan plot", sep = ""),
         adj = 0,
         xlab = "",
-        ylim = c(0, 12),
-        cex = 1,
+        ylim = c(0, 16),
+        cex = 0.5,
         cex.axis = 1,
         cex.main = 2,
         col = c("steelblue", "steelblue1", "slategray3"),
         suggestiveline = -log10(1e-05),
         genomewideline = -log10(5e-08))
 ```
-```{r, fig.width=3, fig.height=3}
-qq(ldl.s1$P,
-        main = "PROMIS 1: LDL Q-Q plot",
-        xlim = c(0, 12),
-        ylim = c(0, 12),
+
+```{r, fig.width = 7, fig.height = 7}
+qq(s1$P,
+        main = paste("PROMIS 1: ", args[1], " Q-Q plot", sep = ""),
+        xlim = c(0, 16),
+        ylim = c(0, 16),
         pch = 18,
         col = "blue4",
-        cex = 1.5,
-        las = 1)
-```
-```{r, fig.width=7.5, fig.height=2.5}
-# plot something random
-manhattan(ldl.s2,
-        main = "PROMIS 2: LDL Manhattan plot",
-        adj = 0,
-        xlab = "",
-        ylim = c(0, 12),
-        cex = 1,
-        cex.axis = 1,
-        cex.main = 2,
-        col = c("steelblue", "steelblue1", "slategray3"),
-        suggestiveline = -log10(1e-05),
-        genomewideline = -log10(5e-08))
-```
-```{r, fig.width=3, fig.height=3}
-qq(ldl.s2$P,
-        main = "PROMIS 2: LDL Q-Q plot",
-        xlim = c(0, 12),
-        ylim = c(0, 12),
-        pch = 18,
-        col = "blue4",
-        cex = 1.5,
+        cex = 0.5,
         las = 1)
 ```
 
-```{r, fig.width=7.5, fig.height=2.5}
- plot something random
-manhattan(ldl.m12,
-        main = "PROMIS 1+2: LDL Meta-Manhattan",
+```{r, fig.width = 15, fig.height = 5}
+manhattan(s2,
+        main = paste("PROMIS 2: ", args[1], " Manhattan plot", sep = ""),
         adj = 0,
         xlab = "",
-        ylim = c(0, 12),
-        cex = 1,
+        ylim = c(0, 16),
+        cex = 0.5,
         cex.axis = 1,
         cex.main = 2,
         col = c("steelblue", "steelblue1", "slategray3"),
         suggestiveline = -log10(1e-05),
         genomewideline = -log10(5e-08))
 ```
-```{r, fig.width=3, fig.height=3}
-qq(ldl.m12$P,
-        main = "PROMIS 1+2: LDL Meta-Q-Q plot",
-        xlim = c(0, 12),
-        ylim = c(0, 12),
+```{r, fig.width = 7, fig.height = 7}
+qq(s2$P,
+        main = paste("PROMIS 2: ", args[1], " Q-Q plot", sep = ""),
+        xlim = c(0, 16),
+        ylim = c(0, 16),
         pch = 18,
         col = "blue4",
-        cex = 1.5,
+        cex = 0.5,
+        las = 1)
+```
+
+```{r, fig.width = 15, fig.height = 5}
+manhattan(d12,
+        main = paste("PROMIS 1+2: ", args[1], " Meta-Manhattan", sep = ""),
+        adj = 0,
+        xlab = "",
+        ylim = c(0, 16),
+        cex = 0.5,
+        cex.axis = 1,
+        cex.main = 2,
+        col = c("steelblue", "steelblue1", "slategray3"),
+        suggestiveline = -log10(1e-05),
+        genomewideline = -log10(5e-08))
+```
+
+```{r, fig.width = 7, fig.height = 7}
+qq(d12$P,
+        main = paste("PROMIS 1+2: ", args[1], " Meta-Q-Q plot", sep = ""),
+        xlim = c(0, 16),
+        ylim = c(0, 16),
+        pch = 18,
+        col = "blue4",
+        cex = 0.5,
         las = 1)
 ```
 
