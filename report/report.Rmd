@@ -22,7 +22,7 @@ Patients were excluded that were marked in the duplicate lists as supplied by JJ
 # Analysis
 
 ## SNPTEST
-Imputed data were analyzed using SNPTEST, where the frequentist method was chosen for association. Filtering on output was based on MAF > .01 and .05, HWE > 10xe06, and INFO > .8
+Imputed data were analyzed using SNPTEST, where the frequentist method was chosen for association. Filtering on output was based on MAF > .01, HWE > 10xe06, and INFO > .8
 
 ## METAL
 Results from association in GWAS1 and GWAS2 were meta-analyzed using METAL.
