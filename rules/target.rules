@@ -31,10 +31,28 @@ rule make_chunklist:
         input:
                 [ expand("out/PROMIS/imputed/GWAS{cohort}/{pheno}/{pheno}_snptest_chunks_gwas{cohort}.txt", cohort = range(1, 3), pheno = config['current']) ]
 
-rule merge_snptest:
+# merge chunks from snptest
+rule make_merge_snptest:
         input:
-                [ expand("out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.maf{maf}.out", cohort = range(1, 3), maf = ['001', '005'], pheno = config['current'])]
+                [ expand("out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.out", cohort = range(1, 3), pheno = config['current']) ]
 
+# filter on MAF, HWE, and INFO
+# requires -M 30860 (or job will fail)
+rule filter_snps:
+        input:
+                [ expand("out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.filtered.out", cohort = range(1, 3), pheno = config['current']) ]
+
+# create metal file
+rule make_metal_file:
+        input:
+                [ expand("script/promis_{pheno}.metal", pheno = config['current']) ]
+
+# run metal
 rule make_metal:
         input:
-                [ expand("out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.maf{maf}1.TBL", maf = ['001', '005'], pheno = config['current'])]
+                [ expand("out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.1.TBL", pheno = config['current']) ]
+
+# manhattan and QQ plots for phenotype
+rule make_report:
+        input:
+                [ expand("report/out/PROMIS_{pheno}_Summary.html", pheno = config['current']) ]
