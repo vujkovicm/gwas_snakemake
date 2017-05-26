@@ -45,15 +45,22 @@ s1    <- read.table(paste(dir, "out/PROMIS/imputed/summary/", args[1], "/", args
 s2    <- read.table(paste(dir, "out/PROMIS/imputed/summary/", args[1], "/", args[1], "_gwas2.snptest.filtered.out", sep = ""), sep = " ",  T, stringsAsFactors = F)
 metal <- read.table(paste(dir, "out/PROMIS/imputed/summary/", args[1], "/promis_", args[1], ".metal.1.TBL", sep = ""), sep = "\t", T, stringsAsFactors = F)
 
-# rename position and p-value for qqman manhattan plots
-colnames(s1)[5]  <- "BP"
-colnames(s1)[23] <- "P"
-colnames(s2)[5]  <- "BP"
-colnames(s2)[23] <- "P"
+# rename SNP, chromosome, position, and p-value variable names for qqman manhattan plots
+colnames(s1)[16] <- "CHR"
+colnames(s1)[3]  <- "BP"
+colnames(s1)[12] <- "P"
+
+colnames(s2)[16] <- "CHR"
+colnames(s2)[3]  <- "BP"
+colnames(s2)[12] <- "P"
+
+colnames(metal)[1]  <- "SNP"
+colnames(metal)[17] <- "CHR"
+colnames(metal)[18] <- "BP"
+colnames(metal)[10] <- "P"
 
 # only select SNPs that occur in both studies
-
-colnames(d12)[7] <- "P"
+metal <- metal[which(metal[14] == 1), ]
 
 ```
 ```{r echo=TRUE}
@@ -110,7 +117,7 @@ qq(s2$P,
 ```
 
 ```{r, fig.width = 15, fig.height = 5}
-manhattan(d12,
+manhattan(metal,
         main = paste("PROMIS 1+2: ", args[1], " Meta-Manhattan", sep = ""),
         adj = 0,
         xlab = "",
@@ -124,7 +131,7 @@ manhattan(d12,
 ```
 
 ```{r, fig.width = 7, fig.height = 7}
-qq(d12$P,
+qq(metal$P,
         main = paste("PROMIS 1+2: ", args[1], " Meta-Q-Q plot", sep = ""),
         xlim = c(0, 16),
         ylim = c(0, 16),
