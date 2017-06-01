@@ -27,8 +27,10 @@ To save the current conda package list, activate the workflow and submit the fol
 
 for python 3.5
 > source activate promis
+
 > conda list --explicit > reqs.txt
 
 or for python 2.7
 > source activate locus
+
 > conda list --explicit > reqs2.txt
