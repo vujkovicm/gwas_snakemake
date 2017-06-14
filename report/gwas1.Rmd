@@ -1,0 +1,81 @@
+---
+title: "PROMIS GWAS Summary"
+author: M.Vujkovic
+output: html_document
+---
+
+# Study Design
+The study population consists of individuals from 1 cohort (GWAS1, n = 9.226) of the the Pakistan Risk of Myocardial Infarction Study (PROMIS). Germline DNA was collected and whole-genome genotyping was performed on the Illumina Infinium Beadchip. Imputation was performed using 1000 Genomes Project data for the reference population.
+
+## Covariates
+- age
+- gender
+- PCA1-10
+
+## Patient Exclusion
+Patients were excluded that were marked in the duplicate lists as supplied by JJ (GWAS1, n = 11).
+
+# Analysis
+
+## SNPTEST
+Imputed data were analyzed using SNPTEST, where the frequentist method was chosen for association. Filtering on output was based on MAF > 0.01, HWE > 10xe06, and INFO > 0.60
+
+## Visualization
+Manhattan and QQ-plots were generated using R-qqman package.
+
+```{r include = FALSE, echo = FALSE, message = FALSE}
+
+args <- commandArgs(trailingOnly = TRUE)
+
+require("ggplot2")
+require("qqman")
+require("data.table")
+
+dir = "/project/saleheenlab/snakemake/"
+
+# For MAF > .05
+s1    <- read.table(paste(dir, "out/PROMIS/imputed/summary/", args[1], "/", args[1], "_gwas1.snptest.filtered.out", sep = ""), sep = " ",  T, stringsAsFactors = F)
+
+# rename SNP, chromosome, position, and p-value variable names for qqman manhattan plots
+colnames(s1)[16] <- "CHR"
+colnames(s1)[3]  <- "BP"
+colnames(s1)[12] <- "P"
+
+```
+
+```{r warning = FALSE, fig.width = 15, fig.height = 5}
+manhattan(s1,
+        main = paste("PROMIS 1: ", args[1], " Manhattan plot", sep = ""),
+        adj = 0,
+        xlab = "",
+        ylim = c(0, -log10(min(s1$P))),
+        cex = 0.7,
+        cex.axis = 1,
+        cex.main = 2,
+        col = c("steelblue", "steelblue1", "slategray3"),
+        suggestiveline = -log10(1e-05),
+        genomewideline = -log10(5e-08))
+```
+
+```{r warning = FALSE, fig.width = 6, fig.height = 6}
+qq(s1$P,
+        main = paste("PROMIS 1: ", args[1], " Q-Q plot", sep = ""),
+        xlim = c(0, -log10(min(s1$P))),
+        ylim = c(0, -log10(min(s1$P))),
+        pch = 18,
+        col = "blue4",
+        cex = 0.7,
+        las = 1)
+```
+
+```{r echo = TRUE}
+# PROMIS 1: GWAS regional hits
+s1.hits <- s1[which(s1$P < 5e-08), c("SNP", "CHR", "BP", "P", "alleleA", "alleleB", "info", "all_maf", "cohort_1_hwe", "frequentist_add_beta_1")]
+s1.hits <- s1.hits[order(s1.hits$CHR, s1.hits$BP), ]
+s1.hits
+```
+
+```{r echo = FALSE, warning = FALSE, results = FALSE, comment = FALSE, message = FALSE}
+write.csv(s1.hits,    paste(dir, "out/PROMIS/imputed/summary/", args[1], "/", args[1], "_gwas1.snptest.filtered.hits", sep = ""), T)
+```
+
