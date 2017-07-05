@@ -21,14 +21,17 @@ You can check if the correct python is called with
 locuszoom only works on python version 2, so create a seperate environment for that to run on
 
 > conda create --name promis2 --file reqs2.txt python = 2.7
+
 > source activate promis2
 
 To save the current conda package list, activate the workflow and submit the following command:
 
 for python 3.5
 > source activate promis3
+
 > conda list --explicit > reqs.txt
 
 or for python 2.7
 > source activate promis2
+
 > conda list --explicit > reqs2.txt
