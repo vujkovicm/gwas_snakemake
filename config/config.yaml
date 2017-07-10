@@ -1,6 +1,19 @@
-current:
+gwasPheno:
  - MI
  - LDL
+
+wesPhenoLin:
+ - LDL
+
+wesPhenoLog:
+ - MI
+ - T2D
+
+# WES Lookup
+# python 2.7
+geneWES:
+ phizer_GDF2_LLRK2:     [GDF2, LRRK2]
+ test_TRIB1_APOE_MAFB:  [TRIB1, APOE, MAFB]
 
 # .sample file
 # order: covariates before phenotypes
