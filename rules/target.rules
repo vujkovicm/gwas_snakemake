@@ -52,8 +52,33 @@ rule make_metal:
         input:
                 [ expand("out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.1.TBL", pheno = config['gwasPheno']) ]
 
-# manhattan and QQ plots for phenotype
+
+#
+# 3. GWAS - REPORT
+#
+
+# manhattan and QQ plots for phenotype (PROMIS1, PROMIS2, and META)
 rule make_report:
         input:
                 [ expand("report/out/PROMIS_{pheno}_Summary.html", pheno = config['gwasPheno']) ]
 
+# only PROMIS1
+rule make_gwas1:
+        input:
+                [ expand("report/out/GWAS1_{pheno}_Summary.html", pheno = config['gwasPheno']) ]
+
+#
+# WES - EPACTS
+#
+
+rule make_wes_ped:
+        input:
+                "pheno/WEseq10.5kPhenoCov.ped"
+
+rule make_wes_epacts_log:
+        input:
+                [ expand("out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.b.score.epacts.gz", pheno = config['wesPhenoLog']) ]
+
+rule make_wes_epacts_lin:
+        input:
+                [ expand("out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.q.emmax.epacts.gz", pheno = config['wesPhenoLin']) ]
