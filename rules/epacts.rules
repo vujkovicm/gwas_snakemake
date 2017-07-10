@@ -1,0 +1,124 @@
+######################################
+# Author: Marijana Vujkovic
+# Date: 07/2017
+#
+# epacts.rules
+######################################
+
+# create .sample including phenotypes and covariates
+rule setWEseqPed:
+        input:
+                "pheno/PROMIS_Universal_40k_PhenoMarkers.tab.gz",
+                "pheno/PROMIS_WEseq_10.5k_PCA1-10.csv"
+        output:
+                "pheno/WEseq10.5kPhenoCov.ped"
+        shell:
+                """
+                Rscript R/WEseq_setPed.R
+                """
+
+# EPCAST association
+rule epacts_log:
+        input:
+                vcf = "/project/saleheenlab/original_data/PROMIS_EXOMESEQ_11K/vcf_and_related_05192016/individual_vcfs/PROMIS_11K.v1.variantQC.sampleQC.chr1.GQ10.vcf.gz",
+                ped = "pheno/WEseq10.5kPhenoCov.ped"
+        output:
+                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.b.score.Makefile"
+        shell:
+                """
+                /project/saleheenlab/software/EPACTS/v3.2.6/EPACTS_EXE/bin/epacts single \
+                --vcf {input.vcf} \
+                --ped {input.ped} \
+                --pheno {wildcards.pheno} \
+                --min-maf 0.001 \
+                --min-callrate 0.8 \
+                --sepchr \
+                --cov AGE \
+                --cov SEX \
+                --cov PC1 --cov PC2 --cov PC3 --cov PC4 --cov PC5 --cov PC6 --cov PC7 --cov PC8 --cov PC9 --cov PC10 \
+                --cov BATCH4564 --cov BATCH4565 --cov BATCH4566 --cov BATCH4571 --cov BATCH4572 --cov BATCH4588 \
+                --cov BATCH4589 --cov BATCH4590 --cov BATCH4591 --cov BATCH4592 --cov BATCH4595 --cov BATCH4596 --cov BATCH4599 \
+                --cov BATCH4600 --cov BATCH4601 --cov BATCH4602 --cov BATCH4603 --cov BATCH4604 --cov BATCH4606 --cov BATCH4607 \
+                --cov BATCH4608 --cov BATCH4734 --cov BATCH5141 --cov BATCH5151 --cov BATCH5152 --cov BATCH5153 --cov BATCH5154 \
+                --cov BATCH5156 --cov BATCH5157 --cov BATCH5158 --cov BATCH5162 --cov BATCH5175 --cov BATCH5176 --cov BATCH5182 \
+                --cov BATCH5185 --cov BATCH5193 --cov BATCH5195 --cov BATCH5197 --cov BATCH5199 --cov BATCH5200 --cov BATCH5210 \
+                --cov BATCH5211 --cov BATCH5212 --cov BATCH5216 --cov BATCH5217 --cov BATCH5218 --cov BATCH5221 --cov BATCH5232 \
+                --cov BATCH5236 --cov BATCH5246 --cov BATCH5250 --cov BATCH5273 --cov BATCH5274 --cov BATCH5278 --cov BATCH5280 \
+                --cov BATCH5281 --cov BATCH5282 --cov BATCH5288 --cov BATCH5289 --cov BATCH5291 --cov BATCH5293 --cov BATCH5294 \
+                --cov BATCH5295 --cov BATCH5296 --cov BATCH5301 --cov BATCH5307 --cov BATCH5308 --cov BATCH5309 --cov BATCH5311 \
+                --cov BATCH5312 --cov BATCH5313 --cov BATCH5314 --cov BATCH5315 --cov BATCH5316 --cov BATCH5319 --cov BATCH5321 \
+                --cov BATCH5322 --cov BATCH5323 --cov BATCH5324 --cov BATCH5325 --cov BATCH5326 --cov BATCH5327 --cov BATCH5341 \
+                --cov BATCH5374 --cov BATCH5384 --cov BATCH5417 --cov BATCH5421 --cov BATCH5453 --cov BATCH5491 --cov BATCH6265 \
+                --cov BATCH6288 --cov BATCH6289 --cov BATCH7667 --cov BATCH7668 --cov BATCH7670 --cov BATCH7671 --cov BATCH7672 \
+                --cov BATCH7673 --cov BATCH7678 --cov BATCH7679 --cov BATCH7680 --cov BATCH7681 --cov BATCH7682 --cov BATCH7683 \
+                --cov BATCH7685 --cov BATCH7686 --cov BATCH7687 --cov BATCH7688 --cov BATCH7689 --cov BATCH7690 --cov BATCH7691 \
+                --cov BATCH7692 --cov BATCH7693 --cov BATCH7732 --cov BATCH7733 --cov BATCH7753 --cov BATCH7802 --cov BATCH7803 \
+                --cov BATCH7805 --cov BATCH7806 --cov BATCH7807 --cov BATCH7818 --cov BATCH7819 --cov BATCH7820 --cov BATCH7822 \
+                --cov BATCH7823 --cov BATCH7835 --cov BATCH7838 --cov BATCH7839 --cov BATCH7840 --cov BATCH7842 --cov BATCH7843 \
+                --cov BATCH7881 --cov BATCH7882 --cov BATCH8028 \
+                --test b.score \
+                --run 20 \
+                --out out/PROMIS/WEseq/assoc/{wildcards.pheno}/WESeq10.5K_{wildcards.pheno}.single.b.score
+                """
+
+rule run_epacts_log:
+        input:
+                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.b.score.Makefile"
+        output:
+                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.b.score.epacts.gz"
+        shell:
+                """
+                make -f {input} -j 20
+                """
+
+rule epacts_lmm:
+        input:
+                vcf = "/project/saleheenlab/original_data/PROMIS_EXOMESEQ_11K/vcf_and_related_05192016/individual_vcfs/PROMIS_11K.v1.variantQC.sampleQC.chr1.GQ10.vcf.gz",
+                ped = "pheno/WEseq10.5kPhenoCov.ped",
+                kin = "pheno/PROMIS_WEseq_10.5k_kinship.mat"
+        output:
+                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.q.emmax.Makefile"
+        shell:
+                """
+                /project/saleheenlab/software/EPACTS/v3.2.6/EPACTS_EXE/bin/epacts single \
+                --vcf {input.vcf} \
+                --test q.emmax --ped {input.ped} --kin {input.kin} --min-maf 0.001 --min-callrate 0.8 \
+                --pheno {wildcards.pheno} \
+                --sepchr \
+                --cov AGE \
+                --cov SEX \
+                --cov BATCH4564 --cov BATCH4565 --cov BATCH4566 --cov BATCH4571 --cov BATCH4572 --cov BATCH4588 \
+                --cov BATCH4589 --cov BATCH4590 --cov BATCH4591 --cov BATCH4592 --cov BATCH4595 --cov BATCH4596 --cov BATCH4599 \
+                --cov BATCH4600 --cov BATCH4601 --cov BATCH4602 --cov BATCH4603 --cov BATCH4604 --cov BATCH4606 --cov BATCH4607 \
+                --cov BATCH4608 --cov BATCH4734 --cov BATCH5141 --cov BATCH5151 --cov BATCH5152 --cov BATCH5153 --cov BATCH5154 \
+                --cov BATCH5156 --cov BATCH5157 --cov BATCH5158 --cov BATCH5162 --cov BATCH5175 --cov BATCH5176 --cov BATCH5182 \
+                --cov BATCH5185 --cov BATCH5193 --cov BATCH5195 --cov BATCH5197 --cov BATCH5199 --cov BATCH5200 --cov BATCH5210 \
+                --cov BATCH5211 --cov BATCH5212 --cov BATCH5216 --cov BATCH5217 --cov BATCH5218 --cov BATCH5221 --cov BATCH5232 \
+                --cov BATCH5236 --cov BATCH5246 --cov BATCH5250 --cov BATCH5273 --cov BATCH5274 --cov BATCH5278 --cov BATCH5280 \
+                --cov BATCH5281 --cov BATCH5282 --cov BATCH5288 --cov BATCH5289 --cov BATCH5291 --cov BATCH5293 --cov BATCH5294 \
+                --cov BATCH5295 --cov BATCH5296 --cov BATCH5301 --cov BATCH5307 --cov BATCH5308 --cov BATCH5309 --cov BATCH5311 \
+                --cov BATCH5312 --cov BATCH5313 --cov BATCH5314 --cov BATCH5315 --cov BATCH5316 --cov BATCH5319 --cov BATCH5321 \
+                --cov BATCH5322 --cov BATCH5323 --cov BATCH5324 --cov BATCH5325 --cov BATCH5326 --cov BATCH5327 --cov BATCH5341 \
+                --cov BATCH5374 --cov BATCH5384 --cov BATCH5417 --cov BATCH5421 --cov BATCH5453 --cov BATCH5491 --cov BATCH6265 \
+                --cov BATCH6288 --cov BATCH6289 --cov BATCH7667 --cov BATCH7668 --cov BATCH7670 --cov BATCH7671 --cov BATCH7672 \
+                --cov BATCH7673 --cov BATCH7678 --cov BATCH7679 --cov BATCH7680 --cov BATCH7681 --cov BATCH7682 --cov BATCH7683 \
+                --cov BATCH7685 --cov BATCH7686 --cov BATCH7687 --cov BATCH7688 --cov BATCH7689 --cov BATCH7690 --cov BATCH7691 \
+                --cov BATCH7692 --cov BATCH7693 --cov BATCH7732 --cov BATCH7733 --cov BATCH7753 --cov BATCH7802 --cov BATCH7803 \
+                --cov BATCH7805 --cov BATCH7806 --cov BATCH7807 --cov BATCH7818 --cov BATCH7819 --cov BATCH7820 --cov BATCH7822 \
+                --cov BATCH7823 --cov BATCH7835 --cov BATCH7838 --cov BATCH7839 --cov BATCH7840 --cov BATCH7842 --cov BATCH7843 \
+                --cov BATCH7881 --cov BATCH7882 --cov BATCH8028 \
+                --out out/PROMIS/WEseq/assoc/{wildcards.pheno}/WESeq10.5K_{wildcards.pheno}.single.q.emmax \
+                --run 20
+                """
+
+rule rune_epacts_lmm:
+        input:
+                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.q.emmax.Makefile"
+        output:
+                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.q.emmax.epacts.gz"
+        shell:
+                """
+                make -f {input} -j 20
+                """
+
+
