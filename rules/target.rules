@@ -24,35 +24,36 @@ rule make_sample:
 # snptest
 rule make_snptest:
         input:
-                [ expand("out/PROMIS/imputed/GWAS{cohort}/{pheno}/chr{interval}.out", cohort = range(1, 3), pheno = config['current'], interval = ((lambda x, y: str(x) + "/promis_chr_" + str(x) + "_" + str((5 * y)) + "e6_" + str(5 * (y + 1)))(x, y) + "e6" for x in range(1, 22) for y in range(0, config['chrChunk'][x]))) ]
+                [ expand("out/PROMIS/imputed/GWAS{cohort}/{pheno}/chr{interval}.out", cohort = range(1, 3), pheno = config['gwasPheno'], interval = ((lambda x, y: str(x) + "/promis_chr_" + str(x) + "_" + str((5 * y)) + "e6_" + str(5 * (y + 1)))(x, y) + "e6" for x in range(1, 22) for y in range(0, config['chrChunk'][x]))) ]
 
 # snptest chunks
 rule make_chunklist:
         input:
-                [ expand("out/PROMIS/imputed/GWAS{cohort}/{pheno}/{pheno}_snptest_chunks_gwas{cohort}.txt", cohort = range(1, 3), pheno = config['current']) ]
+                [ expand("out/PROMIS/imputed/GWAS{cohort}/{pheno}/{pheno}_snptest_chunks_gwas{cohort}.txt", cohort = range(1, 3), pheno = config['gwasPheno']) ]
 
 # merge chunks from snptest
 rule make_merge_snptest:
         input:
-                [ expand("out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.out", cohort = range(1, 3), pheno = config['current']) ]
+                [ expand("out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.out", cohort = range(1, 3), pheno = config['gwasPheno']) ]
 
 # filter on MAF, HWE, and INFO
 # requires -M 30860 (or job will fail)
 rule filter_snps:
         input:
-                [ expand("out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.filtered.out", cohort = range(1, 3), pheno = config['current']) ]
+                [ expand("out/PROMIS/imputed/summary/{pheno}/{pheno}_gwas{cohort}.snptest.filtered.out", cohort = range(1, 3), pheno = config['gwasPheno']) ]
 
 # create metal file
 rule make_metal_file:
         input:
-                [ expand("script/promis_{pheno}.metal", pheno = config['current']) ]
+                [ expand("script/promis_{pheno}.metal", pheno = config['gwasPheno']) ]
 
 # run metal
 rule make_metal:
         input:
-                [ expand("out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.1.TBL", pheno = config['current']) ]
+                [ expand("out/PROMIS/imputed/summary/{pheno}/promis_{pheno}.metal.1.TBL", pheno = config['gwasPheno']) ]
 
 # manhattan and QQ plots for phenotype
 rule make_report:
         input:
-                [ expand("report/out/PROMIS_{pheno}_Summary.html", pheno = config['current']) ]
+                [ expand("report/out/PROMIS_{pheno}_Summary.html", pheno = config['gwasPheno']) ]
+
