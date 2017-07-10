@@ -33,6 +33,30 @@ dotSample:
  status:        [ MI,    B, control]
  ldlmgdl:       [ LDL,   P]
 
+
+# phenotypes from universal sample file
+# not PCA and not BATCH (hardcoded for now)
+wesAnnoPhe:
+ status:        [MI,  B, control ]
+ dm_h:          [T2D, B, 0]
+ ldlmgdl:       [LDL, P]
+ age:           [AGE, C]
+ gender:        [SEX, D, male]
+
+
+# Gene-locuszoom plots for phenotypes
+#
+
+LDL:
+ - EHBP1
+ - BRCA2
+ - FN1
+
+HDL:
+ - ANGPTL1
+ - CITED2
+ - STAB1
+
 # number of chunks per chromosome
 chrChunk:
  - 55
