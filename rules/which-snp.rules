@@ -5,11 +5,12 @@
 # which-snp.rules
 ######################################
 
+
 rule which_snp:
         input:
-                {filename}
+                "{filename}"
         output:
-                {filename}.tmp
+                "{filename}.tmp"
         shell:
                 """
                 Rscript R/which-snp.R '{wildcards.filename}'
@@ -17,33 +18,31 @@ rule which_snp:
 
 rule map_snp:
         input:
-                {filename}.tmp
+                "{filename}.tmp"
         output:
-                {filename}.map
+                "{filename}.map"
         run:
-                with file({input}) as f:
+                with open(input[0]) as f:
                         line = f.readline()
                         ncol = len(line.split())
                 if (ncol == 1):
-                        os.system(
+                        shell(
                         """
                         module load java-sdk-1.8.0
-                        java -Xmx4g -jar /project/saleheenlab/software/SNPTRACKER/snptracker/snptracker.jar \
-                        --noweb \
-                        --in {input} \
+                        java -Xmx4g -jar /project/saleheenlab/software/SNPTRACKER/snptracker/snptracker.jar --no-web \
+                        --in '{input}' \
                         --rsid 1 \
                         --ref hg38 \
-                        --out {output}
+                        --out '{output}'
                         """)
-                if (ncol == 2):
-                        os.system(
+                else:
+                        shell(
                         """
                         module load java-sdk-1.8.0
-                        java -Xmx4g -jar /project/saleheenlab/software/SNPTRACKER/snptracker/snptracker.jar \
-                        --noweb \
-                        --in {input} \
+                        java -Xmx4g -jar /project/saleheenlab/software/SNPTRACKER/snptracker/snptracker.jar --no-web \
+                        --in '{input}' \
                         --chr 1 \
                         --pos 2 \
                         --ref hg38 \
-                        --out {output}
+                        --out '{output}'
                         """)
