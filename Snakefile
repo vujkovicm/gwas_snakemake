@@ -4,6 +4,10 @@ include:
         "rules/target.rules"
 include:
         "rules/promis.rules"
+include:
+        "rules/epacts.rules"
+include:
+        "rules/which-snp.rules"
 
 """
 run on PMACS
