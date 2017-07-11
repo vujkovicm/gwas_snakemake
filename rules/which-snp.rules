@@ -20,7 +20,7 @@ rule map_snp:
         input:
                 "{filename}.tmp"
         output:
-                "{filename}.map"
+                "{filename}.result.txt"
         run:
                 with open(input[0]) as f:
                         line = f.readline()
@@ -33,7 +33,7 @@ rule map_snp:
                         --in '{input}' \
                         --rsid 1 \
                         --ref hg38 \
-                        --out '{output}'
+                        --out '{wildcards.filename}'
                         """)
                 else:
                         shell(
@@ -44,5 +44,5 @@ rule map_snp:
                         --chr 1 \
                         --pos 2 \
                         --ref hg38 \
-                        --out '{output}'
+                        --out '{wildcards.filename}'
                         """)
