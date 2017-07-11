@@ -1,0 +1,49 @@
+######################################
+# Author: Marijana Vujkovic
+# Date: 07/2017
+#
+# which-snp.rules
+######################################
+
+rule which_snp:
+        input:
+                {filename}
+        output:
+                {filename}.tmp
+        shell:
+                """
+                Rscript R/which-snp.R '{wildcards.filename}'
+                """
+
+rule map_snp:
+        input:
+                {filename}.tmp
+        output:
+                {filename}.map
+        run:
+                with file({input}) as f:
+                        line = f.readline()
+                        ncol = len(line.split())
+                if (ncol == 1):
+                        os.system(
+                        """
+                        module load java-sdk-1.8.0
+                        java -Xmx4g -jar /project/saleheenlab/software/SNPTRACKER/snptracker/snptracker.jar \
+                        --noweb \
+                        --in {input} \
+                        --rsid 1 \
+                        --ref hg38 \
+                        --out {output}
+                        """)
+                if (ncol == 2):
+                        os.system(
+                        """
+                        module load java-sdk-1.8.0
+                        java -Xmx4g -jar /project/saleheenlab/software/SNPTRACKER/snptracker/snptracker.jar \
+                        --noweb \
+                        --in {input} \
+                        --chr 1 \
+                        --pos 2 \
+                        --ref hg38 \
+                        --out {output}
+                        """)
