@@ -1,15 +1,20 @@
 args <- commandArgs(trailingOnly = TRUE)
 
 library('tidyr')
-df   <- read.table(args[1], F)
 
-if(grep("chr", df$V1[1]) == 1)
+# import list of rsids or chr:pos
+df   <- read.table(args[1], F, stringsAsFactors = F)
+
+# if field start with 'chr' then its a chr:ps
+if(substr(df$V1[1], 1, 3) == "chr")
 {
-        write.table(df$V1, paste(args[1], ".rs.tmp", sep = ""), sep = "\t", row.names = F, col.names = F, quote = F)
+        x     = separate(df, V1, c("chr", "pos"), sep = ":")
+        x$chr = gsub("chr", "", x$chr)
+        write.table(x, paste(args[1], ".tmp", sep = ""), sep = "\t", row.names = F, col.names = F, quote = F)
 }
-else
+
+# if field doesn't start with 'chr' then it is an rsid
+if(substr(df$V1[1], 1, 3) != "chr")
 {
-        df     = separate(df, V1, c("chr", "pos"), sep = ":")
-        df$chr = gsub("chr", "", df$chr)
-        write.table(df, paste(args[1], ".loc.tmp", sep = ""), sep = "\t", row.names = F, col.names = F, quote = F)
+        write.table(df$V1, paste(args[1], ".tmp", sep = ""), sep = "\t", row.names = F, col.names = F, quote = F)
 }
