@@ -1,0 +1,39 @@
+######################################
+# Author: Marijana Vujkovic
+# Date: 07/2017
+#
+# rvtest.rules
+######################################
+
+# create .sample including phenotypes and covariates
+rule setWEseqPedRVtest:
+        input:
+                "pheno/PROMIS_Universal_40k_PhenoMarkers.tab.gz",
+                "pheno/PROMIS_WEseq_10.5k_PCA1-10.csv"
+        output:
+                "pheno/WEseq10.5kPhenoCov.rvtest.pheno",
+                "pheno/WEseq10.5kPhenoCov.rvtest.covar"
+        shell:
+                """
+                Rscript R/WEseq_setPed.rvtest.R
+                """
+
+rule runWEseqRVtest:
+        input:
+                phe = "pheno/WEseq10.5kPhenoCov.rvtest.pheno",
+                cov = "pheno/WEseq10.5kPhenoCov.rvtest.covar",
+                vcf = "/project/saleheenlab/original_data/PROMIS_EXOMESEQ_11K/vcf_and_related_05192016/individual_vcfs/PROMIS_11K.v1.variantQC.sampleQC.chr{chr}.GQ10.vcf.gz"
+        output:
+                "out/PROMIS/WEseq/assoc/{pheno}/rvtest/WESeq10.5K_{pheno}.chr{chr}.SingleScore.assoc"
+        shell:
+                """
+                /project/saleheenlab/software/RVTEST/rvtests/executable/rvtest \
+                --inVcf {input.vcf} \
+                --pheno {input.phe} \
+                --pheno-name {wildcards.pheno} \
+                --covar {input.cov} \
+                --covar-name AGE,SEX,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,BATCH4589,BATCH4590,BATCH4591,BATCH4592,BATCH4595,BATCH4596,BATCH4599,BATCH4600,BATCH4601,BATCH4602,BATCH4603,BATCH4604,BATCH4606,BATCH4607,BATCH4608,BATCH4734,BATCH5141,BATCH5151,BATCH5152,BATCH5153,BATCH5154,BATCH5156,BATCH5157,BATCH5158,BATCH5162,BATCH5175,BATCH5176,BATCH5182,BATCH5185,BATCH5193,BATCH5195,BATCH5197,BATCH5199,BATCH5200,BATCH5210,BATCH5211,BATCH5212,BATCH5216,BATCH5217,BATCH5218,BATCH5221,BATCH5232,BATCH5236,BATCH5246,BATCH5273,BATCH5274,BATCH5278,BATCH5280,BATCH5281,BATCH5282,BATCH5288,BATCH5289,BATCH5291,BATCH5293,BATCH5294,BATCH5295,BATCH5296,BATCH5301,BATCH5307,BATCH5308,BATCH5309,BATCH5311,BATCH5312,BATCH5313,BATCH5314,BATCH5315,BATCH5316,BATCH5319,BATCH5321,BATCH5322,BATCH5323,BATCH5324,BATCH5325,BATCH5326,BATCH5327,BATCH5341,BATCH5374,BATCH5384,BATCH5417,BATCH5421,BATCH5453,BATCH5491,BATCH6265,BATCH6288,BATCH6289,BATCH7667,BATCH7668,BATCH7670,BATCH7671,BATCH7672,BATCH7673,BATCH7678,BATCH7679,BATCH7680,BATCH7681,BATCH7682,BATCH7683,BATCH7685,BATCH7686,BATCH7687,BATCH7688,BATCH7689,BATCH7690,BATCH7691,BATCH7692,BATCH7693,BATCH7732,BATCH7733,BATCH7753,BATCH7802,BATCH7803,BATCH7805,BATCH7806,BATCH7807,BATCH7818,BATCH7819,BATCH7820,BATCH7822,BATCH7823,BATCH7835,BATCH7838,BATCH7839,BATCH7840,BATCH7842,BATCH7843,BATCH7881,BATCH7882,BATCH8028 \
+                --freqLower 0.01 \
+                --single score \
+                --out out/PROMIS/WEseq/assoc/{wildcards.pheno}/rvtest/WESeq10.5K_{wildcards.pheno}.chr{wildcards.chr}
+                """
