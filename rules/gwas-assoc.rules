@@ -3,7 +3,7 @@
 # Author: Marijana Vujkovic
 # Date: 05/2017
 #
-# snptest.rules
+# gwas-assoc.rules
 ######################################
 
 # create .sample including phenotypes and covariates
