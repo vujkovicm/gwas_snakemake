@@ -23,7 +23,7 @@ rule epacts_log:
                 vcf = "/project/saleheenlab/original_data/PROMIS_EXOMESEQ_11K/vcf_and_related_05192016/individual_vcfs/PROMIS_11K.v1.variantQC.sampleQC.chr1.GQ10.vcf.gz",
                 ped = "pheno/WEseq10.5kPhenoCov.ped"
         output:
-                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.b.score.Makefile"
+                "out/PROMIS/WEseq/assoc/{pheno}/epacts/WESeq10.5K_{pheno}.single.b.score.Makefile"
         shell:
                 """
                 /project/saleheenlab/software/EPACTS/v3.2.6/EPACTS_EXE/bin/epacts single \
@@ -58,17 +58,17 @@ rule epacts_log:
                 --cov BATCH7881 --cov BATCH7882 --cov BATCH8028 \
                 --test b.score \
                 --run 20 \
-                --out out/PROMIS/WEseq/assoc/{wildcards.pheno}/WESeq10.5K_{wildcards.pheno}.single.b.score
+                --out out/PROMIS/WEseq/assoc/{wildcards.pheno}/epacts/WESeq10.5K_{wildcards.pheno}.single.b.score
                 """
 
 rule run_epacts_log:
         input:
-                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.b.score.Makefile"
+                "out/PROMIS/WEseq/assoc/{pheno}/epacts/WESeq10.5K_{pheno}.single.b.score.Makefile"
         output:
-                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.b.score.epacts.gz"
+                "out/PROMIS/WEseq/assoc/{pheno}/epacts/WESeq10.5K_{pheno}.single.b.score.epacts.gz"
         shell:
                 """
-                make -f {input} -j 20
+                bsub lsmake -f {input} 
                 """
 
 rule epacts_lmm:
@@ -77,7 +77,7 @@ rule epacts_lmm:
                 ped = "pheno/WEseq10.5kPhenoCov.ped",
                 kin = "pheno/PROMIS_WEseq_10.5k_kinship.mat"
         output:
-                "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.q.emmax.Makefile"
+                "out/PROMIS/WEseq/assoc/{pheno}/epacts/WESeq10.5K_{pheno}.single.q.emmax.Makefile"
         shell:
                 """
                 /project/saleheenlab/software/EPACTS/v3.2.6/EPACTS_EXE/bin/epacts single \
@@ -107,7 +107,7 @@ rule epacts_lmm:
                 --cov BATCH7805 --cov BATCH7806 --cov BATCH7807 --cov BATCH7818 --cov BATCH7819 --cov BATCH7820 --cov BATCH7822 \
                 --cov BATCH7823 --cov BATCH7835 --cov BATCH7838 --cov BATCH7839 --cov BATCH7840 --cov BATCH7842 --cov BATCH7843 \
                 --cov BATCH7881 --cov BATCH7882 --cov BATCH8028 \
-                --out out/PROMIS/WEseq/assoc/{wildcards.pheno}/WESeq10.5K_{wildcards.pheno}.single.q.emmax \
+                --out out/PROMIS/WEseq/assoc/{wildcards.pheno}/epacts/WESeq10.5K_{wildcards.pheno}.single.q.emmax \
                 --run 20
                 """
 
@@ -118,7 +118,7 @@ rule rune_epacts_lmm:
                 "out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.q.emmax.epacts.gz"
         shell:
                 """
-                make -f {input} -j 20
+                bsub lsmake -f {input}
                 """
 
 
