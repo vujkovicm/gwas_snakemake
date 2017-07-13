@@ -77,8 +77,15 @@ rule make_wes_ped:
 
 rule make_wes_epacts_log:
         input:
-                [ expand("out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.b.score.epacts.gz", pheno = config['wesPhenoLog']) ]
+                [ expand("out/PROMIS/WEseq/assoc/{pheno}/epacts/WESeq10.5K_{pheno}.single.b.score.epacts.gz", pheno = config['wesPhenoLog']) ]
 
 rule make_wes_epacts_lin:
         input:
-                [ expand("out/PROMIS/WEseq/assoc/{pheno}/WESeq10.5K_{pheno}.single.q.emmax.epacts.gz", pheno = config['wesPhenoLin']) ]
+                [ expand("out/PROMIS/WEseq/assoc/{pheno}/epacts/WESeq10.5K_{pheno}.single.q.emmax.epacts", pheno = config['wesPhenoLin']) ]
+
+#
+# WES - RVTEST
+#
+rule make_wes_rvtest:
+        input:
+                [ expand("out/PROMIS/WEseq/assoc/{pheno}/rvtest/WESeq10.5K_{pheno}.chr{chr}.SingleScore.assoc", chr =  range(1, 22), pheno = config['wesPhenoLog'] + config['wesPhenoLin'] ) ]
