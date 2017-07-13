@@ -2,9 +2,8 @@
 # Author: Marijana Vujkovic
 # Date: 07/2017
 #
-# which-snp.rules
+# snp-convert.rules
 ######################################
-
 
 rule which_snp:
         input:
