@@ -6,10 +6,10 @@ Website:
 https://conda.io/miniconda.html
 execute the shell script. Make sure that the path to python in your .bashrc file points to miniconda3 directory.
 
-# if you correctly installed miniconda3 then you can add the following lines to your profile
-# ~/.bashrc file may look like this
-# export PATH="/home/username/miniconda3/bin:$PATH"
-# export PATH="/home/username/miniconda3:$PATH"
+##### if you correctly installed miniconda3 then you can add the following lines to your profile
+##### ~/.bashrc file may look like this
+##### export PATH="/home/username/miniconda3/bin:$PATH"
+##### export PATH="/home/username/miniconda3:$PATH"
 
 You can check if the correct python is called with
 
